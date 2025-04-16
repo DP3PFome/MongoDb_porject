@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8" />
+  <title>To-Do Lista</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    input, button { margin: 5px; }
+    .task { border: 1px solid #ccc; padding: 10px; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>To-Do Lista</h1>
+  <input id="title" placeholder="Nosaukums">
+  <input id="description" placeholder="Apraksts">
+  <button onclick="addTask()">Pievienot</button>
+  <div id="taskList"></div>
+
+  <script>
+    const API = 'http://localhost:3000/tasks';
+
+    async function loadTasks() {
+      const res = await fetch(API);
+      const tasks = await res.json();
+      document.getElementById('taskList').innerHTML = tasks.map(task => `
+        <div class="task">
+          <b>${task.title}</b><br>
+          ${task.description}<br>
+          Status: ${task.status}<br>
+          <button onclick="toggleStatus('${task._id}', '${task.status}')">Mainīt statusu</button>
+          <button onclick="deleteTask('${task._id}')">Dzēst</button>
+        </div>
+      `).join('');
+    }
+
+    async function addTask() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description })
+      });
+      loadTasks();
+    }
+
+    async function toggleStatus(id, currentStatus) {
+      const newStatus = currentStatus === 'pabeigts' ? 'nepabeigts' : 'pabeigts';
+      await fetch(`${API}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      loadTasks();
+    }
+
+    async function deleteTask(id) {
+      await fetch(`${API}/${id}`, { method: 'DELETE' });
+      loadTasks();
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
