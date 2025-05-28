@@ -3,18 +3,9 @@ const mongoose = require('mongoose');
 const TaskSchema = new mongoose.Schema({
   title: String,
   description: String,
-  status: {
-    type: String,
-    default: 'nepabeigts',
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+  status: { type: String, default: 'nepabeigts' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 TaskSchema.pre('save', function (next) {
